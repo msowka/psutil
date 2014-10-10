@@ -440,8 +440,9 @@ psutil_proc_threads(PyObject *self, PyObject *args)
 
     for (i = 0; i < size / sizeof(*kipp); i++) {
         kipp = &kip[i];
-        pyTuple = Py_BuildValue("Idd",
+        pyTuple = Py_BuildValue("Isdd",
                                 kipp->ki_tid,
+				kipp->ki_tdname,
                                 TV2DOUBLE(kipp->ki_rusage.ru_utime),
                                 TV2DOUBLE(kipp->ki_rusage.ru_stime));
         if (pyTuple == NULL)
