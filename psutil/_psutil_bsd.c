@@ -442,7 +442,7 @@ psutil_proc_threads(PyObject *self, PyObject *args)
         kipp = &kip[i];
         pyTuple = Py_BuildValue("Isdd",
                                 kipp->ki_tid,
-				kipp->ki_tdname,
+                                kipp->ki_tdname,
                                 TV2DOUBLE(kipp->ki_rusage.ru_utime),
                                 TV2DOUBLE(kipp->ki_rusage.ru_stime));
         if (pyTuple == NULL)
