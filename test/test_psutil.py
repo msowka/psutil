@@ -479,8 +479,8 @@ if WINDOWS:
 class ThreadTask(threading.Thread):
     """A thread object used for running process thread tests."""
 
-    def __init__(self):
-        threading.Thread.__init__(self)
+    def __init__(self, name=None):
+        threading.Thread.__init__(self, name=name)
         self._running = False
         self._interval = None
         self._flag = threading.Event()
@@ -1419,25 +1419,38 @@ class TestProcess(unittest.TestCase):
         p = psutil.Process()
         step1 = p.threads()
 
-        thread = ThreadTask()
-        thread.start()
+        # TODO: the actual names are not tested for as currently python does not propagate
+        # thread names to os (http://bugs.python.org/issue15500), leave the setup here and
+        # augment the test case when actual thread name is available in os
+        thread1 = ThreadTask(name="thread1")
+        thread1.start()
+        thread2 = ThreadTask(name="thread2")
+        thread2.start()
 
         try:
+            for thread in p.threads():
+                print thread
             step2 = p.threads()
-            self.assertEqual(len(step2), len(step1) + 1)
+            self.assertEqual(len(step2), len(step1) + 2)
             # on Linux, first thread id is supposed to be this process
             if LINUX:
                 self.assertEqual(step2[0].id, os.getpid())
-            athread = step2[0]
+            athread1 = step2[1]
+            athread2 = step2[2]
             # test named tuple
-            self.assertEqual(athread.id, athread[0])
-            self.assertEqual(athread.user_time, athread[1])
-            self.assertEqual(athread.system_time, athread[2])
+            self.assertEqual(athread1.id, athread1[0])
+            self.assertEqual(athread1.thread_name, athread1[1])
+            self.assertEqual(athread2.thread_name, athread2[1])
+            self.assertEqual(athread1.user_time, athread1[2])
+            self.assertEqual(athread1.system_time, athread1[3])
             # test num threads
-            thread.stop()
+            thread1.stop()
+            thread2.stop()
         finally:
-            if thread._running:
-                thread.stop()
+            if thread1._running:
+                thread1.stop()
+            if thread2._running:
+                thread2.stop()
 
     def test_memory_info(self):
         p = psutil.Process()

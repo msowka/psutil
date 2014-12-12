@@ -1034,12 +1034,11 @@ class Process(object):
                 st = f.read().strip()
             finally:
                 f.close()
-            # ignore the first two values ("pid (exe)")
-            st = st[st.find(b(')')) + 2:]
             values = st.split(b(' '))
-            utime = float(values[11]) / CLOCK_TICKS
-            stime = float(values[12]) / CLOCK_TICKS
-            ntuple = _common.pthread(int(thread_id), utime, stime)
+            name = values[1][1:-1]
+            utime = float(values[13]) / CLOCK_TICKS
+            stime = float(values[14]) / CLOCK_TICKS
+            ntuple = _common.pthread(int(thread_id), name, utime, stime)
             retlist.append(ntuple)
         if hit_enoent:
             # raise NSP if the process disappeared on us
